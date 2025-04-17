@@ -10,6 +10,17 @@
             margin: 0;
             padding: 0;
         }
+        .header {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            font-weight: bold;
+        }
         .container {
             width: 70%;
             margin: 30px auto;
@@ -52,6 +63,24 @@
     </style>
 </head>
 <body>
+
+<!-- 🔐 Верхній хедер -->
+<div class="header">
+    <div><strong>Volunteer Portal</strong></div>
+    <div class="user-info">
+        <c:choose>
+            <c:when test="${not empty sessionScope.loggedUser}">
+                Вітаємо, ${sessionScope.loggedUser.username}
+                (<c:out value="${sessionScope.loggedUser.role}"/>) |
+                <a href="/logout">Вийти</a>
+            </c:when>
+            <c:otherwise>
+                <a href="/login">Увійти</a> | <a href="/register">Зареєструватися</a>
+            </c:otherwise>
+        </c:choose>
+    </div>
+</div>
+
 <div class="container">
     <h2>Список подій</h2>
 
@@ -61,6 +90,7 @@
             <p><strong>Опис:</strong> ${event.description}</p>
             <p><strong>Місце:</strong> ${event.location}</p>
             <p><strong>Дата:</strong> ${event.date}</p>
+
             <form method="post" action="/apply">
                 <input type="hidden" name="eventId" value="${event.id}" />
                 <button class="button" type="submit">Подати заявку</button>
@@ -69,8 +99,9 @@
     </c:forEach>
 
     <div class="nav">
-        <a href="/event/new">Створити подію</a>
-        <a href="/register">Зареєструватися</a>
+        <c:if test="${sessionScope.loggedUser != null && sessionScope.loggedUser.role == 'ORGANIZER'}">
+            <a href="/event/new">Створити подію</a>
+        </c:if>
         <a href="/applications">Заявки</a>
     </div>
 </div>

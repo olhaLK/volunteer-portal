@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class MainController {
@@ -86,4 +88,29 @@ public class MainController {
         }
         return "redirect:/applications";
     }
+
+    @GetMapping("/login")
+    public String loginForm(Model model) {
+        model.addAttribute("user", new User());
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String login(@ModelAttribute User user, HttpSession session, Model model) {
+        User found = userRepository.findByUsername(user.getUsername());
+        if (found != null && found.getPassword().equals(user.getPassword())) {
+            session.setAttribute("loggedUser", found);
+            return "redirect:/";
+        }
+        model.addAttribute("error", "Невірне ім’я користувача або пароль");
+        return "login";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+
+
 }
